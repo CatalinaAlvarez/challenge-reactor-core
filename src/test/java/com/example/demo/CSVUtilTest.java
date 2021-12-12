@@ -92,17 +92,17 @@ public class CSVUtilTest {
         List<Player> list = csvUtilFile.getPlayers();
         Flux<Player> listFlux = Flux.fromStream(list.parallelStream()).cache();
         Mono<Map<String, Collection<Player>>> listFilter = listFlux
-                .filter(player -> player.age == 27) //se añade el filter para que no corran todos los datos debido a la cantidad
+                .filter(player -> player.age == 27) //se añade el filter para que no impriman todos los datos debido a la cantidad
                 .map(player -> {
                     player.name = player.name.toUpperCase(Locale.ROOT);
                     return player;
                 })
+                .sort((p,w)->w.winners-p.winners)
                 .collectMultimap(Player::getNational);
+
         listFilter.block().forEach((national, players) -> {
             System.out.println("\n"+national);
-            players.stream().sorted((p,w)->w.winners-p.winners).forEach(p -> System.out.println(p.name + "- Partidos ganados: " +p.winners));
+            players.stream().forEach(p -> System.out.println(p.name + "- Partidos ganados: " +p.winners));
         });
     }
-
-
 }
